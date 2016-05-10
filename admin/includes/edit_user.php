@@ -26,6 +26,16 @@
         $user_email = $_POST['user_email'];
         $user_password = $_POST['user_password'];
 
+        $query = "SELECT user_randSalt FROM users";
+        $select_rand_salt_query = mysqli_query($connection, $query);
+        if(!$select_rand_salt_query) {
+            die("Query failed " . mysqli_error($connection));
+        }
+
+        $row = mysqli_fetch_array($select_rand_salt_query);
+        $salt = $row['user_randSalt'];
+        $user_password = crypt($user_password, $salt);
+
         $query = "UPDATE users SET ";
         $query .= "user_firstname = '{$user_firstname}', ";
         $query .= "user_lastname = '{$user_lastname}', ";
@@ -70,7 +80,7 @@
         <label for="user_role">Role</label>
         <br>
         <select name="user_role" id="">
-            <option value="subscriber"><?php echo $user_role; ?></option>
+            <option value="<?php echo $user_role; ?>"><?php echo $user_role; ?></option>
             <?php
                 if ($user_role == 'admin') {
                     echo "<option value='subscriber>Subscriber</option>";
